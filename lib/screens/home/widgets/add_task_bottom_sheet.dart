@@ -1,11 +1,10 @@
-import 'dart:math';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/common/dialog_utils.dart';
 import 'package:todo_app/database/fireDataBase.dart';
 import 'package:todo_app/database/models/task_model.dart';
-import 'package:todo_app/database/models/user_model.dart';
+import 'package:todo_app/generated/locale_keys.g.dart';
 import 'package:todo_app/provider/user_provider.dart';
 import 'package:todo_app/screens/auth/widgets/custom_text_field.dart';
 import 'package:todo_app/utils/date_utils.dart';
@@ -61,7 +60,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Add New Task",
+                LocaleKeys.addNewTaskTitle.tr(),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -69,7 +68,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
               ),
               SizedBox(height: 20),
               Text(
-                "Task Title",
+                LocaleKeys.taskTitle.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -80,20 +79,20 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 validate: (value) {
                   if (value != null) {
                     if (value.isEmpty) {
-                      return "required";
+                      return LocaleKeys.required.tr();
                     } else if (value.length < 2) {
-                      return "title is too short";
+                      return LocaleKeys.titleShort.tr();
                     }
                   }
                   return null;
                 },
                 controller: newTaskTitleController,
-                hintText: 'Enter the Task Title ',
-                labelText: 'Task Title',
+                hintText: LocaleKeys.enterTaskTitle.tr(),
+                labelText: LocaleKeys.taskTitle.tr(),
               ),
               SizedBox(height: 20),
               Text(
-                "Task Description",
+                LocaleKeys.taskDesc.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -104,21 +103,21 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 validate: (value) {
                   if (value != null) {
                     if (value.isEmpty) {
-                      return "required";
+                      return LocaleKeys.required.tr();
                     } else if (value.length < 5) {
-                      return "descreption is too short";
+                      return LocaleKeys.descShort.tr();
                     }
                   }
                   return null;
                 },
                 controller: newTaskDescreptionController,
-                hintText: 'Enter the Task Description ',
-                labelText: 'Task Description',
+                hintText: LocaleKeys.enterTaskDesc.tr(),
+                labelText: LocaleKeys.taskDesc.tr(),
                 maxLines: 3,
               ),
               SizedBox(height: 20),
               Text(
-                "date",
+                LocaleKeys.date.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -144,17 +143,26 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       DialogUtils.showLoadingDialog(context);
-                      var userProvider = Provider.of<UserProvider>(context, listen: false);
-                      print(userProvider.getUser()?.id);
+                      var userProvider =
+                          Provider.of<UserProvider>(context, listen: false);
+                      print(userProvider.currentUser?.id);
                       var task = TaskModel(
-                          taskDate: DateTime(selectedDate.year, selectedDate.month, selectedDate.day),
+                          taskDate: DateTime(selectedDate.year,
+                              selectedDate.month, selectedDate.day),
                           desc: newTaskDescreptionController.text,
                           title: newTaskTitleController.text);
-                      await FireDataBase.addTask(task, userProvider.getUser()?.id ?? "");
+
+                      // Ensure the user is fetched before proceeding
+                      await userProvider.getUser();
+                      //future<UserModel>!= UserModel ==>future<UserModel>.id =>Error
+                      // Safely check if the user exists before accessing the id
+                      var userId = userProvider.currentUser?.id;
+                      await FireDataBase.addTask(task, userId ?? "");
+                      // await FireDataBase.addTask(task, userId);
                       DialogUtils.hideDialog(context);
                       DialogUtils.showMessage(context,
-                          message: "Add task successfully",
-                          postActionName: "ok", postAction: () {
+                          message: LocaleKeys.addTaskSuccess.tr(),
+                          postActionName: LocaleKeys.ok.tr(), postAction: () {
                         Navigator.pop(context);
                       });
                     }
@@ -168,7 +176,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                           BorderRadius.circular(15), // Rounded corners
                     ),
                   ),
-                  child: Text('Done'),
+                  child: Text(LocaleKeys.confirmNewTask.tr()),
                 ),
               ),
               SizedBox(height: 20),

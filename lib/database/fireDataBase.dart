@@ -8,8 +8,8 @@ class FireDataBase {
         .collection(UserModel.userCollectionName)
         .withConverter<UserModel>(
           fromFirestore: (snapshot, _) =>
-              UserModel.fromFireStore(snapshot.data()),
-          toFirestore: (user, options) => user.toFireStore(),
+              UserModel.fromJson(snapshot.data()),
+          toFirestore: (user, options) => user.toJson(),
         );
   }
 

@@ -1,18 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 import 'package:todo_app/screens/auth/login/login.dart';
+import 'package:todo_app/screens/home/home_screen.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   static const splashRouteName = "/";
 
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Future.delayed(
-        Duration(seconds: 2),
-        () => Navigator.of(context)
-            .pushReplacementNamed(LoginScreen.loginRouteName));
+  _SplashScreenState createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkUser();
+  }
+
+  // Method to check if user exists in SharedPreferences
+  _checkUser() async {
+
+    // Wait for a brief moment to simulate splash screen
+    await Future.delayed(Duration(seconds: 2), () async {
+        // If user data exists, load user data and navigate to the main screen
+        await Provider.of<UserProvider>(context, listen: false).getUser();
+        if (mounted) {
+          Navigator.pushReplacementNamed(context,
+              HomeScreen.homeScreenRouteName);
+        } else {
+        // If user data doesn't exist, navigate to the login screen
+        if (mounted) {
+          Navigator.pushReplacementNamed(
+              context, LoginScreen.loginRouteName);
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Image.asset("assets/images/logo.png"),

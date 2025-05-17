@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/generated/locale_keys.g.dart';
 
 class DialogUtils {
   static void showLoadingDialog(BuildContext context) {
@@ -11,7 +13,7 @@ class DialogUtils {
                   SizedBox(
                     width: 12,
                   ),
-                  Text("Loading.....")
+                  Text(LocaleKeys.loading.tr())
                 ],
               ),
             ),

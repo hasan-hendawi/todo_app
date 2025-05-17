@@ -1,9 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/common/dialog_utils.dart';
 import 'package:todo_app/database/fireDataBase.dart';
-import 'package:todo_app/database/models/user_model.dart';
+import 'package:todo_app/generated/locale_keys.g.dart';
 import 'package:todo_app/provider/settings_provider.dart';
 import 'package:todo_app/provider/user_provider.dart';
 import 'package:todo_app/screens/auth/signup/signup_screen.dart';
@@ -21,7 +22,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -36,8 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-            image: provider.getAuthBackgroundImage(),
-            fit: BoxFit.fill),
+            image: provider.getAuthBackgroundImage(), fit: BoxFit.fill),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -45,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           title: Text(
-            "Login",
+            LocaleKeys.authLogin.tr(),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -66,13 +65,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomTextField(
                     validate: (value) {
                       if (value == null || value.isEmpty) {
-                        return "please enter your email";
+                        return LocaleKeys.plsEnterEmail.tr();
                       }
                       return null;
                     },
                     controller: emailController,
-                    hintText: "Email",
-                    labelText: "Email",
+                    hintText: LocaleKeys.authEmail.tr(),
+                    labelText: LocaleKeys.authEmail.tr(),
                   ),
                   SizedBox(
                     height: 18,
@@ -80,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomTextField(
                     validate: (value) {
                       if (value == null || value.isEmpty) {
-                        return "please enter your password";
+                        return LocaleKeys.plsEnterPass;
                       }
                       return null;
                     },
@@ -89,8 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     showText: showPass,
                     controller: passwordController,
-                    hintText: "Password",
-                    labelText: "Password",
+                    hintText: LocaleKeys.authPassword.tr(),
+                    labelText: LocaleKeys.authPassword.tr(),
                     suffixIcon: IconButton(
                       icon: Icon(showPass
                           ? Icons.remove_red_eye_outlined
@@ -108,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerLeft,
                     child: TextButton(
                       onPressed: () {},
-                      child: Text("Forgot password?"),
+                      child: Text(LocaleKeys.authForgetPass.tr()),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -127,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Login",
+                            LocaleKeys.authLogin.tr(),
                             style: TextStyle(
                                 color: checkFields()
                                     ? Colors.white
@@ -150,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           context, SignupScreen.signupRouteName);
                     },
                     child: Text(
-                      "Create Account",
+                      LocaleKeys.authCreateAccount.tr(),
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
@@ -164,45 +163,41 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void login(BuildContext co) async {
-    var userProvider = Provider.of<UserProvider>(context,listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
     if (globalKey.currentState!.validate()) {
       try {
         DialogUtils.showLoadingDialog(co);
-        final result =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text,
+        final result = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
           password: passwordController.text,
         );
-        var user = await FireDataBase.getUser(result.user?.uid??'');
-       if (user!=null) {
-          userProvider.updateUser(user);
-
+        var user = await FireDataBase.getUser(result.user?.uid ?? '');
+        if (user != null) {
+          userProvider.setUser(user);
         }
-print(user?.id);
+        print(user?.id);
         DialogUtils.hideDialog(co);
         DialogUtils.showMessage(co,
-            message: "user Logged successfully",
+            message: LocaleKeys.loginSuccess.tr(),
             diss: false,
-            postActionName: "ok", postAction: () {
+            postActionName: LocaleKeys.ok.tr(), postAction: () {
           Navigator.of(context)
               .pushReplacementNamed(HomeScreen.homeScreenRouteName);
         });
       } on FirebaseAuthException catch (e) {
         DialogUtils.hideDialog(co);
         print("the error is : $e");
-        // if (e.code == 'user-not-found') {
-        //   print('No user found for that email.');
-        // }
-        if (e.code == 'wrong-password') {
+        if (e.code == 'invalid-credential') {
           DialogUtils.showMessage(co,
-              message: 'Wrong password or email.', postActionName: "ok");
+              message: LocaleKeys.wrongPassOrEmail.tr(),
+              postActionName: LocaleKeys.ok.tr());
         }
       } catch (e) {
         DialogUtils.hideDialog(co);
         DialogUtils.showMessage(co,
-            message: "Something went wrong",
-            postActionName: "cancel",
-            negActionName: "try again", negAction: () {
+            message: LocaleKeys.somethingWentWrong.tr(),
+            postActionName: LocaleKeys.cancel.tr(),
+            negActionName: LocaleKeys.tryAgain.tr(), negAction: () {
           login(co);
         });
       }

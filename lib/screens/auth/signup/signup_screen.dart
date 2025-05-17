@@ -1,14 +1,15 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/common/dialog_utils.dart';
 import 'package:todo_app/database/fireDataBase.dart';
 import 'package:todo_app/database/models/user_model.dart';
+import 'package:todo_app/generated/locale_keys.g.dart';
 import 'package:todo_app/provider/settings_provider.dart';
 import 'package:todo_app/provider/user_provider.dart';
 import 'package:todo_app/screens/auth/widgets/custom_text_field.dart';
 import 'package:todo_app/screens/home/home_screen.dart';
-import 'package:todo_app/theme/my_theme.dart';
 import 'package:todo_app/utils/validation.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _SignupScreenState extends State<SignupScreen> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           title: Text(
-            "Create Account",
+            LocaleKeys.authCreateAccount.tr(),
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -68,14 +69,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(height: height * .3),
                   CustomTextField(
                     controller: firstNameController,
-                    hintText: "First Name",
-                    labelText: "First Name",
+                    hintText: LocaleKeys.authFname.tr(),
+                    labelText: LocaleKeys.authFname.tr(),
                     validate: (value) {
                       if (value == null || value.isEmpty) {
-                        return "please enter name";
+                        return LocaleKeys.plsEnterName.tr();
                       }
                       if (value.length < 2 || value.length > 15) {
-                        return 'please enter correct name';
+                        return LocaleKeys.plsEnterCorrectName.tr();
                       }
                       return null;
                     },
@@ -85,11 +86,11 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   CustomTextField(
                     controller: emailController,
-                    hintText: "Email",
-                    labelText: "Email",
+                    hintText: LocaleKeys.authEmail.tr(),
+                    labelText: LocaleKeys.authEmail.tr(),
                     validate: (val) {
                       if (val == null || val.isEmpty)
-                        return "please enter email";
+                        return LocaleKeys.plsEnterEmail.tr();
                       if (!Validation.emailValid(val)) return "wrong email";
                       return null;
                     },
@@ -101,11 +102,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     validate: (value) {
                       if (value != null) {
                         if (value.length < 8) {
-                          return "password too short";
+                          return LocaleKeys.passTooShort.tr();
                         }
                       }
                       if (value == null || value.isEmpty) {
-                        return "required";
+                        return LocaleKeys.required.tr();
                       }
                       return null;
                     },
@@ -114,8 +115,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                     showText: showPass,
                     controller: passwordController,
-                    hintText: "Password",
-                    labelText: "Password",
+                    hintText: LocaleKeys.authPassword.tr(),
+                    labelText: LocaleKeys.authPassword.tr(),
                     suffixIcon: IconButton(
                       icon: Icon(showPass
                           ? Icons.remove_red_eye_outlined
@@ -144,7 +145,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Create Account",
+                              LocaleKeys.authCreateAccount.tr(),
                               style: TextStyle(
                                   color: checkFields()
                                       ? Colors.white
@@ -184,15 +185,15 @@ class _SignupScreenState extends State<SignupScreen> {
           email: emailController.text,
         );
         await FireDataBase.addUser(user);
-        userProvider.updateUser(user);
+        userProvider.setUser(user);
         DialogUtils.hideDialog(context);
 
         DialogUtils.showMessage(context,
-            message: "user registered successfully",
+            message: LocaleKeys.userRegisteredSuccess.tr(),
             diss: false,
-            postActionName: "ok", postAction: () {
+            postActionName: LocaleKeys.ok.tr(), postAction: () {
           Navigator.of(context)
-              .pushReplacementNamed(HomeScreen.homeScreenRouteName);
+              .pushReplacementNamed(HomeScreen.homeScreenRouteName );
         });
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
