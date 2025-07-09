@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:todo_app/database/models/user_model.dart';
 import 'package:todo_app/firebase_options.dart';
 import 'package:todo_app/provider/settings_provider.dart';
 import 'package:todo_app/provider/user_provider.dart';
@@ -10,6 +13,7 @@ import 'package:todo_app/screens/home/home_screen.dart';
 import 'package:todo_app/screens/splash/splash_screen.dart';
 import 'package:todo_app/theme/my_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_app/utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +21,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  var dir =await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
+  Hive.registerAdapter(UserModelAdapter());//TODO: add UserAdapter
+  await Hive.openBox<UserModel>(Constants.userKey);
 
   runApp(
     MultiProvider(
@@ -31,7 +39,8 @@ void main() async {
           fallbackLocale: Locale('en'),
           startLocale: Locale("en"),
           saveLocale: true,
-          child: const TodoApp()),
+          child: const TodoApp(),
+      ),
     ),
   );
 }

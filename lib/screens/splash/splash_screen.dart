@@ -24,18 +24,19 @@ class _SplashScreenState extends State<SplashScreen> {
   _checkUser() async {
 
     // Wait for a brief moment to simulate splash screen
-    await Future.delayed(Duration(seconds: 2), () async {
+    await Future.delayed(Duration(seconds: 2), ()  {
         // If user data exists, load user data and navigate to the main screen
-        await Provider.of<UserProvider>(context, listen: false).getUser();
-        if (mounted) {
+      var userProvider=Provider.of<UserProvider>(context, listen: false);
+      userProvider.getUser();
+
+        if (userProvider.currentUser!=null) {
+
           Navigator.pushReplacementNamed(context,
               HomeScreen.homeScreenRouteName);
         } else {
         // If user data doesn't exist, navigate to the login screen
-        if (mounted) {
           Navigator.pushReplacementNamed(
               context, LoginScreen.loginRouteName);
-        }
       }
     });
   }

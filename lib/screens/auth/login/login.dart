@@ -175,7 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
         if (user != null) {
           userProvider.setUser(user);
         }
-        print(user?.id);
         DialogUtils.hideDialog(co);
         DialogUtils.showMessage(co,
             message: LocaleKeys.loginSuccess.tr(),

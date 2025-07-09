@@ -1,30 +1,21 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
 import 'package:todo_app/database/models/user_model.dart';
 import 'package:todo_app/utils/constants.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _updatedUser;
+  var box = Hive.box<UserModel>(Constants.userKey);
 
-  void setUser(UserModel user) async {
-    var shared = await SharedPreferences.getInstance();
-    //chat
-    bool success = await shared.setString(Constants.userKey, json.encode(user.toJson()));
-    if (success) {
-      _updatedUser = user;
-      notifyListeners();
-    } else {
-      print("cant set the user from the user provider");
-    }
+  void setUser(UserModel user) {
+    box.put(Constants.userBox, user);
+    _updatedUser = user;
+    notifyListeners();
   }
 
-  Future<void> getUser() async {
-    final shared = await SharedPreferences.getInstance();
-    String? userString = shared.getString(Constants.userKey);
-    if (userString != null && userString.isNotEmpty) {
-      _updatedUser = UserModel.fromJson(json.decode(userString));
-    }  notifyListeners();
+  void getUser() {
+    _updatedUser = box.get(Constants.userBox);
+    notifyListeners();
   }
 
   UserModel? get currentUser => _updatedUser;

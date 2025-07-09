@@ -151,9 +151,6 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                               selectedDate.month, selectedDate.day),
                           desc: newTaskDescreptionController.text,
                           title: newTaskTitleController.text);
-
-                      // Ensure the user is fetched before proceeding
-                      await userProvider.getUser();
                       //future<UserModel>!= UserModel ==>future<UserModel>.id =>Error
                       // Safely check if the user exists before accessing the id
                       var userId = userProvider.currentUser?.id;
